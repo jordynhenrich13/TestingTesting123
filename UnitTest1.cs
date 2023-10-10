@@ -1,4 +1,5 @@
 using Lab2;
+using System.Collections.ObjectModel;
 
 namespace TestingTesting123;
 
@@ -7,46 +8,59 @@ public class UnitTest1
 
     BusinessLogic businesslogic = new BusinessLogic();
 
+    //[Fact]
+    //public void DeleteAllAirports()
+    //{
+    //    businesslogic.DeleteAirport("KFLD");
+    //    businesslogic.DeleteAirport("KLSE");
+    //    businesslogic.DeleteAirport("KMKE");
+    //    businesslogic.DeleteAirport("KCWA");
+    //    businesslogic.DeleteAirport("KGRB");
+    //}
+
     [Fact]
-    public void InsertAirport()
+    public void InsertAirportClassic()
     {
-        businesslogic.AddAirport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 5);
+      
+            businesslogic.AddAirport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 5);
+       
         Assert.NotNull(businesslogic.FindAirport("KFLD"));
     }
 
-    private void RunAirportEdgeTest(string airportCode, string airportName, DateTime openingDate, int runwayCount)
+    private void RunAirportEdgeTest(string id, string city, DateTime dateVisited, int rating)
     {
-        businesslogic.AddAirport(airportCode, airportName, openingDate, runwayCount);
-        Assert.Null(businesslogic.FindAirport(airportCode));
+        businesslogic.AddAirport(id, city, dateVisited, rating);
+        Assert.Null(businesslogic.FindAirport(id));
     }
 
     [Fact]
-    public void AddAirportEdgeTest2()
+    public void InsertAirportInvalidHighRating()
     {
         RunAirportEdgeTest("KRRL", "Merrill", new DateTime(2023, 6, 20), 6);
     }
 
     [Fact]
-    public void AddAirportEdgeTest3()
+    public void InsertAirportInvalidLowRating()
     {
         RunAirportEdgeTest("KLNL", "Land O' Lakes", new DateTime(2023, 6, 20), 0);
     }
     [Fact]
-    public void AddAirportEdgeTest4()
+    public void InsertAirportInvalidId()
     {
         RunAirportEdgeTest("STE", "Stevens Point", new DateTime(2023, 6, 20), 6);
     }
 
     [Fact]
-    public void AddDuplicateAirportTest()
+    public void InsertDuplicateAirport()
     {
-        Assert.False(businesslogic.AddAirport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 5));
+        businesslogic.AddAirport("KAIG", "Antigo", new DateTime(2023, 9, 18), 2);
+        Assert.False(businesslogic.AddAirport("KAIG", "Antigo", new DateTime(2023, 9, 18), 2));
     }
 
     [Fact]
     public void DeleteNonExistantAirportTest()
     {
-        Assert.False(businesslogic.DeleteAirport("KSTE"));
+        Assert.False(businesslogic.DeleteAirport("KEAU"));
     }
 
     [Fact]
@@ -58,41 +72,42 @@ public class UnitTest1
     [Fact]
     public void EditAirportTest()
     {
-        businesslogic.DeleteAirport("KFLD");
-        businesslogic.AddAirport("KFLD", "fond du lac", new DateTime(2023, 9, 18), 5);
-        businesslogic.EditAirport("KFLD", "Fond du Lac", new DateTime(2023, 9, 20), 3);
-        Assert.Equal(new Airport("KFLD", "Fond du Lac", new DateTime(2023, 9, 20), 3), businesslogic.FindAirport("KFLD"));
-        
+        businesslogic.AddAirport("KLSE", "lacrosse", new DateTime(2023, 9, 18), 5);
+        businesslogic.EditAirport("KLSE", "La Crosse", new DateTime(2023, 9, 20), 3);
+        Assert.Equivalent(new Airport("KLSE", "La Crosse", new DateTime(2023, 9, 20), 3), businesslogic.FindAirport("KLSE"));
     }
 
     [Fact]
-    public void EditAirportEdgeCaseTest1()
+    public void UpdateWithInvalidCityLengthTest()
     {
-        businesslogic.DeleteAirport("KSTE");
-        businesslogic.AddAirport("KSTE", "Stevens Point", new DateTime(2023, 9, 18), 5);
-        businesslogic.EditAirport("KSTE", "Stevens Point", new DateTime(2023, 9, 18), 5);
-
-        Airport airport = new Airport("KSTE", "Stevens Point", new DateTime(2023, 9, 18), 5);
-        Assert.Equal(airport.City, businesslogic.FindAirport("KSTE").City);
-        
-
-       
+        businesslogic.DeleteAirport("KMKE");
+        businesslogic.AddAirport("KMKE", "Milwaukee", new DateTime(2023, 9, 18), 3);
+        businesslogic.EditAirport("KMKE", "MilwaukeeWisconsinisWhereTheMKEBucksPlay", new DateTime(2023, 9, 18), 3);
+        Assert.Equivalent(new Airport("KMKE", "Milwaukee", new DateTime(2023, 9, 18), 3), businesslogic.FindAirport("KMKE"));
     }
 
-    //[Fact]
-    //public void EditAirportEdgeCaseTest2()
-    //{
-    //    businesslogic.AddAirport("KFLD", "fond du lac", new DateTime(2023, 9, 18), 5);
-    //    businesslogic.EditAirport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 3);
-    //    Assert.Equal(new Airport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 3), businesslogic.FindAirport("KFLD"));
+    [Fact]
+    public void UpdateWithInvalidRatingTest()
+    {
+        businesslogic.AddAirport("KCWA", "Mosinee", new DateTime(2023, 9, 18), 3);
+        businesslogic.EditAirport("KCWA", "Mosinee", new DateTime(2023, 9, 18), 6);
+        Assert.NotStrictEqual(new Airport("KCWA", "Mosinee", new DateTime(2023, 9, 18), 3), businesslogic.FindAirport("KCWA"));
 
-    //}
-    //[Fact]
-    //public void EditAirportEdgeCaseTest3()
-    //{
-    //    businesslogic.AddAirport("KFLD", "fond du lac", new DateTime(2023, 9, 18), 5);
-    //    businesslogic.EditAirport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 3);
-    //    Assert.Equal(new Airport("KFLD", "Fond du Lac", new DateTime(2023, 9, 18), 3), businesslogic.FindAirport("KFLD"));
+    }
 
-    //}
+    [Fact]
+    public void UpdateNonExistantAirportTest()
+    {
+        businesslogic.EditAirport("KGRB", "Green Bay", new DateTime(2023, 9, 18), 3);
+        Assert.Null(businesslogic.FindAirport("KGRB"));
+
+    }
+   
+
+    [Fact]
+    public void SelectAllAirportsTest()
+    {
+        ObservableCollection<Airport> airports = businesslogic.GetAirports();
+        Assert.NotNull(airports);
+    }
 }
